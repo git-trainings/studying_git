@@ -16,5 +16,3 @@
       "#{c.            to_s(3
      6)}";p             rint"#
    {32.ch                r}"}).join)
-   
-#=> ruby is a dynamic open source programming language with a focus on simplicity and productivity
