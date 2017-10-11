@@ -6,6 +6,7 @@ SERVER_NAME = "test.gomasy.jp"
 
 class ProxyServlet < HTTPServlet::AbstractServlet
   @@ignore = [ "connection", "transfer-encoding", "via", "x-cache", "x-cache-lookup", "x-squid-error" ]
+  @@rewrite = [ "ニコニコ", "プレミアム", "オススメ", "niconico", "けものフレンズ", "けもフレ" ]
 
   def do_GET(req, res)
     proxy = Net::HTTP::Proxy('localhost', 3128)
@@ -13,19 +14,16 @@ class ProxyServlet < HTTPServlet::AbstractServlet
     fwd_res = http.get(req.path, req.header.each{|k, v| req.header[k] = v[0]})
     fwd_res.header.each do |h|
       f = true
-      @@ignore.each do |i|
-        f = false if i == h.downcase
+      @@ignore.each do |e|
+        f = false if e == h.downcase
       end
       res[h] = fwd_res[h] if f
     end
     res.status = fwd_res.code
-    if fwd_res.body.include?("utf-8")
-      fwd_res.body.force_encoding("utf-8").gsub!("ニコニコ", "ちんこ")
-      fwd_res.body.force_encoding("utf-8").gsub!("プレミアム", "ちんこ")
-      fwd_res.body.force_encoding("utf-8").gsub!("オススメ", "ちんこ")
-      fwd_res.body.force_encoding("utf-8").gsub!("niconico", "ちんこ")
-      fwd_res.body.force_encoding("utf-8").gsub!("けものフレンズ", "ちんこ")
-      fwd_res.body.force_encoding("utf-8").gsub!("けもフレ", "ちんこ")
+    if !fwd_res.body.nil? && (fwd_res.body.include?("utf-8") || fwd_res.body.include?("UTF-8"))
+      @@rewrite.each do |e|
+        fwd_res.body.force_encoding("utf-8").gsub!(e, "ちんこ")
+      end
     end
     res.body = fwd_res.body
   end
