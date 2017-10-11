@@ -11,7 +11,7 @@ class ProxyServlet < HTTPServlet::AbstractServlet
   def do_GET(req, res)
     proxy = Net::HTTP::Proxy('localhost', 3128)
     http = req.host != SERVER_NAME ? proxy.new(req.host) : Net::HTTP.new("localhost", 8080)
-    fwd_res = http.get(req.path, req.header.each{|k, v| req.header[k] = v.kind_of?(String) ? v : v[0]})
+    fwd_res = http.get(req.path, req.header.each{|k, v| req.header[k] = v[0]})
     fwd_res.header.each do |h|
       f = true
       @@ignore.each do |e|
